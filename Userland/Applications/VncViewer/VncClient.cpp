@@ -71,7 +71,7 @@ void VncClient::on_socket_connected()
 bool VncClient::connect()
 {
     if (m_socket->is_connected())
-        ASSERT_NOT_REACHED();
+        VERIFY_NOT_REACHED();
 
     m_socket->on_connected = [this] { on_socket_connected(); };
 
@@ -87,7 +87,7 @@ void VncClient::receive_from_server()
                 outln("VncClient: Connection closed!");
                 exit(1);
             }
-            ASSERT_NOT_REACHED();
+            VERIFY_NOT_REACHED();
         }
         //process_line(line);
     }

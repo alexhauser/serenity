@@ -50,7 +50,7 @@ VncViewerAppWindow& VncViewerAppWindow::the()
 
 VncViewerAppWindow::VncViewerAppWindow(String server, int port)
 {
-    ASSERT(!s_the);
+    VERIFY(!s_the);
     s_the = this;
 
     auto client = VncClient::construct("192.168.100.100", VNC_PORT);
