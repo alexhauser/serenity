@@ -38,6 +38,16 @@ const int VNC_PORT = 5900;
 class VncClient  : public Core::Object {
     C_OBJECT(VncClient);
 
+    enum State {
+        Connected,
+        ProtocolVersionHandshake,
+        SecurityHandshake,
+        SecurityResultHandshake,
+        ClientInit,
+        ServerInit,
+        NormalCommunication
+    };
+
 public:
     virtual ~VncClient() override;
 
@@ -47,12 +57,16 @@ public:
     String hostname() const { return m_hostname; }
     int port() const { return m_port; }
 
+    void send(const String&);
+    void send(const ReadonlyBytes& bytes);
+
 
 private:
     VncClient(String server, int port);
     void receive_from_server();
     void on_socket_connected();
 
+    State m_state { State::Connected };
     String m_hostname;
     int m_port { VNC_PORT };
 

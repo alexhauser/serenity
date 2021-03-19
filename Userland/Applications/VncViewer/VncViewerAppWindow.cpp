@@ -53,14 +53,22 @@ VncViewerAppWindow::VncViewerAppWindow(String server, int port)
     VERIFY(!s_the);
     s_the = this;
 
-    auto client = VncClient::construct("192.168.100.100", VNC_PORT);
+    //String value;
+    //if (GUI::InputBox::show(this, value, "Enter server:", "Connect to server") == GUI::InputBox::ExecCancel)
+    //   ::exit(0);
+    //server = value;
+
+    auto client = VncClient::construct("192.168.100.100", 45661);
 
     if (!client->connect()) {
         perror("Connect failed!");
         return;
     } else {
-        perror("Yesss!");
+        dbgln("Connect succeeded!");
     }
+
+    client->send("RFB 003.008\n");
+    dbgln("Send took place!");
 
 
     RFBProto::ProtocolVersion pv;
@@ -71,6 +79,7 @@ VncViewerAppWindow::VncViewerAppWindow(String server, int port)
     set_icon(Gfx::Bitmap::load_from_file("/res/icons/16x16/app-irc-client.png"));
 
     resize(600, 400);
+
 }
 
 VncViewerAppWindow::~VncViewerAppWindow()

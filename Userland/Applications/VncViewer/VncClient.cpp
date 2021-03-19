@@ -64,6 +64,8 @@ void VncClient::set_server(const String& hostname, int port)
 
 void VncClient::on_socket_connected()
 {
+    perror("on_socket_connected called!");
+
     m_notifier = Core::Notifier::construct(m_socket->fd(), Core::Notifier::Read);
     m_notifier->on_ready_to_read = [this] { receive_from_server(); };
 }
@@ -73,13 +75,18 @@ bool VncClient::connect()
     if (m_socket->is_connected())
         VERIFY_NOT_REACHED();
 
+    dbgln("connect() called!");
+
     m_socket->on_connected = [this] { on_socket_connected(); };
 
+    dbgln("calling socket->connect()!");
     return m_socket->connect(m_hostname, m_port);
 }
 
 void VncClient::receive_from_server()
 {
+    perror("receive_from_server called!");
+
     while (m_socket->can_read_line()) {
         auto line = m_socket->read_line();
         if (line.is_null()) {
@@ -89,6 +96,24 @@ void VncClient::receive_from_server()
             }
             VERIFY_NOT_REACHED();
         }
-        //process_line(line);
+
+        auto msg = String::formatted("Got line: {}", line);
+        perror(msg.characters());
+    }
+}
+
+void VncClient::send(const String& text)
+{
+    if (!m_socket->send(text.bytes())) {
+        perror("send");
+        exit(1);
+    }
+}
+
+void VncClient::send(const ReadonlyBytes& bytes)
+{
+    if (!m_socket->send(bytes)) {
+        perror("send");
+        exit(1);
     }
 }
