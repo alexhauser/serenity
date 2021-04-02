@@ -58,7 +58,7 @@ VncViewerAppWindow::VncViewerAppWindow(String server, int port)
     //   ::exit(0);
     //server = value;
 
-    auto client = VncClient::construct("192.168.100.100", 45661);
+    auto client = VncClient::construct("192.168.100.101", 5900);
 
     if (!client->connect()) {
         perror("Connect failed!");
@@ -66,6 +66,13 @@ VncViewerAppWindow::VncViewerAppWindow(String server, int port)
     } else {
         dbgln("Connect succeeded!");
     }
+
+    ReadonlyBytes* data;
+    do {
+        data = client->receive();
+    } while (data == nullptr);
+
+    dbgln("Got {} bytes from server: {}", data->size(), data->data());
 
     client->send("RFB 003.008\n");
     dbgln("Send took place!");

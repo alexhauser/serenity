@@ -64,7 +64,7 @@ void VncClient::set_server(const String& hostname, int port)
 
 void VncClient::on_socket_connected()
 {
-    perror("on_socket_connected called!");
+    dbgln("on_socket_connected() called!");
 
     m_notifier = Core::Notifier::construct(m_socket->fd(), Core::Notifier::Read);
     m_notifier->on_ready_to_read = [this] { receive_from_server(); };
@@ -78,6 +78,7 @@ bool VncClient::connect()
     dbgln("connect() called!");
 
     m_socket->on_connected = [this] { on_socket_connected(); };
+    dbgln("m_socket->on_onnected is {}", &m_socket->on_connected);
 
     dbgln("calling socket->connect()!");
     return m_socket->connect(m_hostname, m_port);
@@ -108,6 +109,8 @@ void VncClient::send(const String& text)
         perror("send");
         exit(1);
     }
+
+    dbgln("Successfully sent: {}", text);
 }
 
 void VncClient::send(const ReadonlyBytes& bytes)
@@ -116,4 +119,24 @@ void VncClient::send(const ReadonlyBytes& bytes)
         perror("send");
         exit(1);
     }
+}
+
+ReadonlyBytes* VncClient::receive()
+{
+    if (!m_socket->can_read()) {
+        dbgln("receive() called but no data!");
+        return nullptr;
+    }
+
+    auto data = m_socket->read_all();
+    if (data.is_null()) {
+        if (!m_socket->is_connected()) {
+            outln("VncClient: Connection closed!");
+            exit(1);
+        }
+        VERIFY_NOT_REACHED();
+    }
+
+    dbgln("Got data: {}", String((ReadonlyBytes)data.bytes()));
+    return new ReadonlyBytes((data.bytes()));
 }

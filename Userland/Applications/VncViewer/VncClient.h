@@ -28,6 +28,7 @@
 
 #include <AK/CircularQueue.h>
 #include <AK/Function.h>
+#include <AK/ByteBuffer.h>
 #include <AK/HashMap.h>
 #include <AK/String.h>
 #include <LibCore/ConfigFile.h>
@@ -59,6 +60,8 @@ public:
 
     void send(const String&);
     void send(const ReadonlyBytes& bytes);
+
+    ReadonlyBytes* receive();
 
 
 private:
